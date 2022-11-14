@@ -8,6 +8,7 @@ const styleName = (value) => {
     '-': 'opt',
     'x': 'opt',
     '/': 'opt',
+    'EXP': 'opt'
   }
   return className[value];
 }
@@ -17,22 +18,23 @@ const Button = ({ buttons }) => {
 
   const numberClick = () => {
     const numString = buttons.toString();
-    let numberValue;
-    if (numString === '0' && calc.num === '0') {
-      numberValue = '0';
-    } else {
-      numberValue = Number(calc.num + numString);
-    }
+    let currentNumber = calc.num.toString() === '0' ? numString : calc.num + numString;
     setCalc({
       ...calc,
-      num: numberValue
+      num: currentNumber,
     })
   }
-  const signClick = () => {
+  const exponentClick = () => (
     setCalc({
-      sign: buttons,
-      res: !calc.res && calc.num ? calc.num : calc.res,
-      num: 0
+      ...calc,
+      num: calc.num + '**',
+    })
+  )
+  const signClick = () => {
+    let currentSign = buttons === 'x' ? '*' : buttons
+    setCalc({
+      ...calc,
+      num: calc.num + currentSign,
     })
   }
   const decimalClick = () => {
@@ -42,43 +44,30 @@ const Button = ({ buttons }) => {
     })
   }
   const equalsClick = () => {
-    if (calc.res && calc.num) {
-      const calculation = (a, b, sign) => {
-        const result = {
-          '+': (a, b) => a + b,
-          '-': (a, b) => a - b,
-          'x': (a, b) => a * b,
-          '/': (a, b) => a / b,
-        }
-        return result[sign](a, b);
+    if (calc.num) {
+      let result;
+      try {
+        result = eval(calc.num);
+      } catch (error) {
+        result = 'Error'
       }
-      setCalc({
-        res: calculation(calc.res, calc.num, calc.sign),
-        sign: '',
-        num: 0
-      })
+      finally {
+        console.log(result);
+        if (result) {
+          setCalc({
+            num: result,
+          })
+        }
+      }
     }
   }
   const resetClick = () => {
     setCalc({
-      sign: '',
       num: 0,
       res: 0
     })
   }
-  const percentClick = () => {
-    setCalc({
-      num: (calc.num / 100),
-      res: (calc.res / 100),
-      sign: ''
-    })
-  }
-  const invertClick = () => {
-    setCalc({
-      num: calc.num ? calc.num * -1 : 0,
-      res: calc.res ? calc.res * -1 : 0
-    })
-  }
+
   const handleClick = () => {
     const result = {
       '.': decimalClick,
@@ -88,8 +77,7 @@ const Button = ({ buttons }) => {
       'x': signClick,
       '/': signClick,
       '=': equalsClick,
-      '%': percentClick,
-      '+-': invertClick
+      'EXP': exponentClick,
     };
     if (result[buttons]) {
       return result[buttons]();

@@ -4,11 +4,12 @@ import ButtonWrapper from './components/ButtonWrapper';
 import Button from './components/Button';
 import CalcProvider from './context/Calculation';
 const buttonValues = [
-  ["C", "+-", "%", "/"],
+  ["C", "(", ")", "/"],
   [7, 8, 9, "x"],
   [4, 5, 6, "-"],
   [1, 2, 3, "+"],
-  [0, ".", "="]
+  [0, ".", "EXP"],
+  ['=']
 ]
 
 function App() {
